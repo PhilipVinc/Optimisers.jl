@@ -24,10 +24,27 @@ function update!(opt, x::AbstractArray{<:Number}, x̄::AbstractArray, state = no
   return state
 end
 
-function update!(opt, x, x̄::NamedTuple)
+function update!(opt, x::Tuple, x̄::Tuple, state=nothing)
   for f in fieldnames(typeof(x̄))
     f̄ = getfield(x̄, f)
-    f̄ === nothing || update!(opt, getfield(x, f), f̄)
+    f̄ === nothing || update!(opt, getfield(x, f), f̄, state)
+  end
+end
+
+function update!(opt, x, x̄::NamedTuple, state=nothing)
+  for f in fieldnames(typeof(x̄))
+    f == :tuple_all_weights && continue
+    f̄ = getfield(x̄, f)
+
+    f̄ === nothing || update!(opt, getfield(x, f), f̄, state)
+  end
+end
+
+function update!(opt, x, x̄, state=nothing)
+  for f in fieldnames(typeof(x̄))
+    f̄ = getfield(x̄, f)
+
+    f̄ === nothing || update!(opt, getfield(x, f), f̄, state)
   end
 end
 
